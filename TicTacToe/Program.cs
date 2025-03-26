@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace TicTacToe;
@@ -47,5 +48,21 @@ static class Program
         });
         
         return dictionary;
+    }
+
+    static async Task partidas(Dictionary<string,string> )
+    {
+        var totalPartidas = 10;
+        var partida = 1;
+
+        while (partida > totalPartidas)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetFromJsonAsync<UrlPartida>()
+            }
+        }
+        
+        Console.WriteLine(partida);
     }
 }
