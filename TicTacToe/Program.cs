@@ -13,9 +13,14 @@ static class Program
     {
         var jugadorsStr = await PullInfoJugadors();
         if (jugadorsStr is null) throw new Exception("No hi ha jugadors a la llist, null exception");
-        var jugadors = ConverteixPresentacionsEnJugadors(jugadorsStr);
-        generarPartidas(jugadors);
+        
+        var jugadors = ConverteixPresentacionsEnJugadors(jugadorsStr); 
+        await generarPartidas(jugadors);
         jugadors.ForEach(x => Console.WriteLine(x.nombreJugador + ": " + x.partidasGanadas));
+        
+        var victories = jugadors.Max(j => j.partidasGanadas);
+        var campeon = jugadors.Find(j => j.partidasGanadas == victories);
+        Console.WriteLine($"El campeón es: {campeon.nombreJugador} con {campeon.partidasGanadas} victorias.");
     }
     static async Task<List<string>?> PullInfoJugadors()
     {
@@ -28,7 +33,6 @@ static class Program
         }
         return contentList;
     }
-    
     static List<Jugador> ConverteixPresentacionsEnJugadors(List<string> presentacions)
     {
         const string patronJugador = @"participant\s([a-zA-Z'-]+\s[a-zA-Z'-]+)";
@@ -56,18 +60,19 @@ static class Program
     {
         using (var client = new HttpClient())
         {
-            for (int i = 0; i < 10000; i++)
+            for (int i = 1; i < 10000; i++)
             {
-                Console.WriteLine("-------------------");
-
-                var partida = await client.GetFromJsonAsync<Partida>($"{UrlPartida}/{i}");
-                if (partida == null)
-                    Console.WriteLine("Error partida");
+                var partida = await client.GetFromJsonAsync<Partida>(UrlPartida + i);
                 var ganador = partida.Ganador();
-                Console.WriteLine(ganador);
-                jugadors.Find(x => x.nombreJugador == ganador).partidasGanadas++;
+                if (ganador != "Empate")
+                {
+                    var jugadorGanador = jugadors.Find(x => x.nombreJugador == ganador);
+                    if (jugadorGanador != null)
+                    {
+                        jugadorGanador.partidasGanadas++;
+                    }
+                }
             }
-            Console.WriteLine("error");
         }
     }
 }

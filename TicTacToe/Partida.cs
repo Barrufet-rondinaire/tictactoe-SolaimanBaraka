@@ -5,7 +5,6 @@ public class Partida
     public string jugador1 { get; set; }
     public string jugador2 { get; set; }
     public List<string> Tauler { get; set; }
-
     private string CaracterGanador()
     {
         // Líneas horizontales
@@ -14,14 +13,12 @@ public class Partida
             if (Tauler[i][0] == Tauler[i][1] && Tauler[i][0] == Tauler[i][2] && Tauler[i][0] != '.')
                 return Tauler[i][0].ToString();
         }
-
         // Líneas verticales
         for (int j = 0; j < 3; j++)
         {
             if (Tauler[0][j] == Tauler[1][j] && Tauler[0][j] == Tauler[2][j] && Tauler[0][j] != '.')
                 return Tauler[0][j].ToString();
         }
-        
         // Lineas Diagonales
         if (Tauler[0][0] == Tauler[1][1] && Tauler[0][0] == Tauler[2][2] && Tauler[0][0] != '.')
             return Tauler[0][0].ToString();
