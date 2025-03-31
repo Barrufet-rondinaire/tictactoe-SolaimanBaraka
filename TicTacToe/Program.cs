@@ -11,11 +11,13 @@ static class Program
     private const string UrlPartida = Url + "partida/";
     static async Task Main(string[] args)
     {
-        var jugadors = await PullInfo();
-        if (jugadors is null) throw new Exception("No hi ha jugadors a la llist, null exception");
-        var paisJugadors = ConverteixPresentacionsEnPaisJugadors(jugadors);
+        var jugadorsStr = await PullInfoJugadors();
+        if (jugadorsStr is null) throw new Exception("No hi ha jugadors a la llist, null exception");
+        var jugadors = ConverteixPresentacionsEnJugadors(jugadorsStr);
+        generarPartidas(jugadors);
+        jugadors.ForEach(x => Console.WriteLine(x.nombreJugador + ": " + x.partidasGanadas));
     }
-    static async Task<List<string>?> PullInfo()
+    static async Task<List<string>?> PullInfoJugadors()
     {
         List<String>? contentList;
         using (var client = new HttpClient())
@@ -26,7 +28,8 @@ static class Program
         }
         return contentList;
     }
-    static Dictionary<String, String> ConverteixPresentacionsEnPaisJugadors(List<string> presentacions)
+    
+    static List<Jugador> ConverteixPresentacionsEnJugadors(List<string> presentacions)
     {
         const string patronJugador = @"participant\s([a-zA-Z'-]+\s[a-zA-Z'-]+)";
         const string patronPais = @"representa?[a-zA-Z]+\s[a-zA-Z]+\s([a-zA-Z]+)";
@@ -34,7 +37,7 @@ static class Program
         Regex rgxJugador = new Regex(patronJugador);
         Regex rgxPais = new Regex(patronPais);
         
-        var dictionary = new Dictionary<String, String>();
+        var jugadors = new List<Jugador>();
         presentacions.ForEach(x =>
         {
             var matchJugador = rgxJugador.Match(x);
@@ -42,27 +45,29 @@ static class Program
             
             var strJugador = matchJugador.Groups[1].Value;
             var strPais = matchPais.Groups[1].Value;
-            dictionary.Add(strPais, strJugador);
+            jugadors.Add(new Jugador(strJugador, strPais));
             
             Console.WriteLine($"Jugador: {strJugador}, País: {strPais}");
         });
         
-        return dictionary;
+        return jugadors;
     }
-
-    static async Task partidas(Dictionary<string,string> )
+    static async Task generarPartidas(List<Jugador> jugadors)
     {
-        var totalPartidas = 10;
-        var partida = 1;
-
-        while (partida > totalPartidas)
+        using (var client = new HttpClient())
         {
-            using (var client = new HttpClient())
+            for (int i = 0; i < 10000; i++)
             {
-                var response = await client.GetFromJsonAsync<UrlPartida>()
+                Console.WriteLine("-------------------");
+
+                var partida = await client.GetFromJsonAsync<Partida>($"{UrlPartida}/{i}");
+                if (partida == null)
+                    Console.WriteLine("Error partida");
+                var ganador = partida.Ganador();
+                Console.WriteLine(ganador);
+                jugadors.Find(x => x.nombreJugador == ganador).partidasGanadas++;
             }
+            Console.WriteLine("error");
         }
-        
-        Console.WriteLine(partida);
     }
 }
