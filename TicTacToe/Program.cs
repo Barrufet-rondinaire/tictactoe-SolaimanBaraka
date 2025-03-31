@@ -20,6 +20,8 @@ static class Program
         
         var victories = jugadors.Max(j => j.partidasGanadas);
         var campeon = jugadors.Find(j => j.partidasGanadas == victories);
+        
+        Console.WriteLine("-----------Campeon------------");
         Console.WriteLine($"El campeón es: {campeon.nombreJugador} con {campeon.partidasGanadas} victorias.");
     }
     static async Task<List<string>?> PullInfoJugadors()
@@ -42,6 +44,7 @@ static class Program
         Regex rgxPais = new Regex(patronPais);
         
         var jugadors = new List<Jugador>();
+        Console.WriteLine("-----------Lista de Jugadors------------");
         presentacions.ForEach(x =>
         {
             var matchJugador = rgxJugador.Match(x);
@@ -53,7 +56,6 @@ static class Program
             
             Console.WriteLine($"Jugador: {strJugador}, País: {strPais}");
         });
-        
         return jugadors;
     }
     static async Task generarPartidas(List<Jugador> jugadors)
@@ -74,5 +76,6 @@ static class Program
                 }
             }
         }
+        Console.WriteLine("-----------Resultados de la Competicion------------");
     }
 }
